@@ -1,94 +1,113 @@
 :root {
-    --bg: #050505;
-    --card: #0f0f0f;
-    --accent: #00f5d4;
-    --text: #e0e0e0;
-    --font-size: 16px;
+    --bg-color: #0d1117;
+    --card-bg: #161b22;
+    --accent-color: #00f5d4; /* シアン */
+    --text-main: #ffffff;
+    --text-dim: #8b949e;
+    --font-base: 16px;
 }
 
 body {
-    background-color: var(--bg);
-    color: var(--text);
-    font-family: 'Consolas', 'Courier New', 'Noto Sans JP', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
     margin: 0;
-    font-size: var(--font-size);
-    overflow-x: hidden;
+    font-size: var(--font-base);
+    line-height: 1.6;
 }
 
+/* Header & Access */
 header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 20px 40px;
-    border-bottom: 1px solid #222;
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(5,5,5,0.8);
-    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #30363d;
+}
+.accent { color: var(--accent-color); }
+.accessibility-controls button {
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    margin-left: 10px;
+    cursor: pointer;
+    padding: 5px 10px;
 }
 
-.logo { font-weight: bold; letter-spacing: 3px; }
-.logo span { color: var(--accent); }
+/* Hero Section */
+.hero { text-align: center; padding: 80px 20px; }
+.glitch {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--accent-color);
+    letter-spacing: 0.1em;
+}
 
-.hero-section { text-align: center; padding: 100px 20px; }
-.glitch { font-size: 4rem; color: var(--accent); letter-spacing: 10px; }
+/* Search Unit */
+.search-section { max-width: 900px; margin: 0 auto 60px; padding: 0 20px; }
+.search-container {
+    display: flex;
+    align-items: center;
+    background: #000;
+    border: 1px solid #333;
+    padding: 5px;
+}
+.search-container .label { padding: 0 15px; font-family: monospace; color: var(--accent-color); }
+#idSearchInput {
+    background: transparent; border: none; color: #fff;
+    padding: 10px; flex-grow: 1; outline: none; font-size: 1rem;
+}
+#searchBtn {
+    background: var(--accent-color); border: none; padding: 10px 30px;
+    font-weight: bold; cursor: pointer;
+}
 
+/* Grid Layout */
 .data-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 40px;
-    max-width: 1400px;
-    margin: 0 auto 100px;
-    padding: 0 40px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-/* カードデザイン（写真/テック融合） */
+/* Card Design */
 .card {
-    background: var(--card);
-    border: 1px solid #333;
-    padding: 40px;
+    background: var(--card-bg);
+    border: 1px solid #30363d;
+    padding: 30px;
     position: relative;
     cursor: pointer;
-    transition: 0.4s;
+    transition: 0.3s;
 }
-
 .card:hover {
-    border-color: var(--accent);
-    box-shadow: 0 0 40px rgba(0, 245, 212, 0.15);
-    transform: translateY(-10px);
+    border-color: var(--accent-color);
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px rgba(0, 245, 212, 0.1);
 }
+.card .meta { font-family: monospace; font-size: 0.8rem; color: #666; margin-bottom: 10px; }
+.card h3 { margin: 0 0 15px 0; color: var(--accent-color); }
+.card p { font-size: 0.9rem; color: var(--text-dim); }
 
-.card h3 { color: var(--accent); margin: 0 0 15px; }
-.card .meta { font-size: 0.8rem; color: #666; margin-bottom: 20px; }
-
-/* 没入型リーダー */
+/* Reader Overlay */
 .reader-overlay {
     display: none;
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: #000; z-index: 1000;
 }
-
-.reader-controls {
-    position: absolute; top: 20px; right: 40px; z-index: 1010;
+.reader-bar {
+    height: 60px; background: #111; display: flex;
+    justify-content: space-between; align-items: center; padding: 0 20px;
+    border-bottom: 1px solid var(--accent-color);
 }
+.reader-content { height: calc(100% - 60px); width: 100%; }
+#pdfFrame { width: 100%; height: 100%; }
 
-.reader-controls button {
-    background: none; border: 1px solid var(--accent); color: var(--accent);
-    padding: 10px 20px; cursor: pointer; margin-left: 10px;
-}
-
-/* 付箋 */
+/* Sticky Note */
 .sticky-note {
-    position: absolute; padding: 15px; background: #ffff00; color: #000;
-    width: 150px; z-index: 1005; cursor: move; border-radius: 2px;
-    box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
-}
-
-/* PDFビューアのマスク（ダウンロード禁止の錯覚） */
-.reader-canvas {
-    width: 100%; height: 100%;
-    pointer-events: auto;
-}
-
-embed {
-    /* ブラウザ標準のUIを隠すためのハック（完全ではないがダウンロードボタンは見えにくくなる） */
-    overflow: hidden;
+    position: absolute; width: 180px; min-height: 100px;
+    background: #ffeb3b; color: #000; padding: 15px;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+    cursor: move; z-index: 1100; font-family: 'cursive';
 }
