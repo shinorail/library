@@ -1,4 +1,4 @@
-<!DOCTYPE html>　
+<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -8,6 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0d1117">
     <link rel="apple-touch-icon" href="icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
 </head>
 <body class="dark-theme">
     <div id="app">
@@ -15,8 +16,8 @@
             <div class="header-inner">
                 <div class="logo">篠ノ井乗務区 <span class="accent">S.R.C.C.</span></div>
                 <nav class="a11y-tools">
-                    <button id="fontUp" title="文字拡大">A+</button>
-                    <button id="fontDown" title="文字縮小">A-</button>
+                    <button id="fontUp" aria-label="文字拡大">A+</button>
+                    <button id="fontDown" aria-label="文字縮小">A-</button>
                 </nav>
             </div>
         </header>
@@ -33,51 +34,42 @@
                     <input type="text" id="idSearchInput" placeholder="SRC-2605A" autocomplete="off">
                     <button id="searchBtn">EXECUTE</button>
                 </div>
-                <div id="searchStatus" class="status-text"></div>
             </section>
 
             <section class="library-container">
                 <h2 class="section-title">LIBRARY ARCHIVE</h2>
                 <div id="shelf" class="grid-layout">
-                    <div class="loading">CONNECTING TO DATABASE...</div>
-                </div>
+                    </div>
             </section>
         </main>
 
         <footer>
             <div class="footer-links">
-                <button id="btnTerms">利用規約</button>
-                <button id="btnPrivacy">プライバシーポリシー</button>
+                <button onclick="showLegal('terms')">利用規約</button>
+                <button onclick="showLegal('privacy')">プライバシーポリシー</button>
             </div>
             <p class="copy">© 2026 篠ノ井乗務区 S.R.C.C.</p>
         </footer>
 
         <div id="reader" class="overlay hidden">
             <div class="overlay-bar">
-                <span id="docTitle">ACCESSING...</span>
+                <span id="docTitle">SYSTEM_ACCESSING...</span>
                 <div class="overlay-btns">
-                    <button id="addSticky" class="btn-sm">MEMO+</button>
-                    <button id="closeReader" class="btn-sm close-accent">CLOSE</button>
+                    <button id="addSticky" class="btn-sm">MEMO</button>
+                    <button id="closeReader" class="btn-sm close-btn">CLOSE</button>
                 </div>
             </div>
             <div id="stickyLayer"></div>
-            <div class="viewer-container">
-                <object id="pdfViewer" data="" type="application/pdf">
-                    <div class="mobile-fallback">
-                        <p>ブラウザの制限により直接表示できません。</p>
-                        <a id="downloadLink" href="" target="_blank" class="btn-primary">ドキュメントを別タブで開く</a>
-                    </div>
-                </object>
-            </div>
+            <div class="viewer-container" id="viewerContainer">
+                </div>
         </div>
-        
+
         <div id="legalOverlay" class="overlay hidden">
             <div class="overlay-bar">
                 <span id="legalTitle">LEGAL_INFO</span>
-                <button id="closeLegal" class="btn-sm">CLOSE</button>
+                <button onclick="closeLegal()" class="btn-sm">CLOSE</button>
             </div>
-            <div class="legal-content" id="legalText">
-                </div>
+            <div class="legal-content" id="legalText"></div>
         </div>
     </div>
     <script src="script.js"></script>
