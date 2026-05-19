@@ -3,41 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>篠ノ井乗務区 | 電子図書館</title>
+    <title>S.R.C.C. ARCHIVE</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="dark-theme">
+    <header>
+        <div class="logo">篠ノ井乗務区 <span>S.R.C.C.</span></div>
+        <nav>
+            <button id="fontSizeUp">A+</button>
+            <button id="fontSizeDown">A-</button>
+        </nav>
+    </header>
 
-<header>
-    <div class="hero">
-        <h1>篠ノ井乗務区 電子図書館</h1>
-        <p>信州の鉄路を愛する情熱と、現代のシステム技術の融合</p>
-    </div>
-</header>
+    <main id="app">
+        <section class="hero-section">
+            <h1 class="glitch" data-text="LIBRARY_ARCHIVE">LIBRARY_ARCHIVE</h1>
+            <p>鉄道の情熱を、デジタルの力で形にする。</p>
+        </section>
 
-<main>
-    <div class="shelf-container">
-        <div id="shelf" class="book-grid">
-            <p class="loading">資料を配線中...</p>
+        <div id="shelf" class="data-grid">
+            <div class="loader">CONNECTING TO DATABASE...</div>
+        </div>
+    </main>
+
+    <div id="reader" class="reader-overlay">
+        <div class="reader-controls">
+            <button onclick="closeReader()">CLOSE _</button>
+            <button id="addSticky">ADD STICKY（付箋）</button>
+        </div>
+        <div id="sticky-container"></div>
+        <div class="reader-canvas">
+            <embed id="pdfViewer" src="" type="application/pdf" width="100%" height="100%" />
         </div>
     </div>
-</main>
 
-<footer>
-    <div class="footer-links">
-        <a onclick="openModal('terms')">利用規約</a>
-        <a onclick="openModal('privacy')">ポリシー</a>
-    </div>
-    <p>&copy; 2026 篠ノ井乗務区</p>
-</footer>
-
-<div id="modal-bg" class="modal" onclick="closeModal()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <div id="modal-body"></div>
-        <button onclick="closeModal()">閉じる</button>
-    </div>
-</div>
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
