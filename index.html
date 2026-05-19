@@ -1,58 +1,85 @@
 <!DOCTYPE html>
-<html lang="ja">　
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S.R.C.C. LIBRARY ARCHIVE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>S.R.C.C. LIBRARY</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d1117">
+    <link rel="apple-touch-icon" href="icon.png">
 </head>
 <body class="dark-theme">
-    <header>
-        <div class="logo">篠ノ井乗務区 <span class="accent">S.R.C.C.</span></div>
-        <nav class="accessibility-controls">
-            <button onclick="adjustFontSize(2)" title="文字を大きく">A+</button>
-            <button onclick="adjustFontSize(-2)" title="文字を小さく">A-</button>
-        </nav>
-    </header>
-
-    <main>
-        <section class="hero">
-            <h1 class="glitch" data-text="RAILWAY × TECHNOLOGY">RAILWAY × TECHNOLOGY</h1>
-            <p class="subtitle">鉄道の情熱を、デジタルの力で形にする。</p>
-        </section>
-
-        <section class="search-section">
-            <div class="search-container">
-                <span class="label">ARCHIVE_ACCESS:</span>
-                <input type="text" id="idSearchInput" placeholder="ENTER ID (e.g. SRC-2605A)">
-                <button id="searchBtn">EXECUTE</button>
+    <div id="app">
+        <header>
+            <div class="header-inner">
+                <div class="logo">篠ノ井乗務区 <span class="accent">S.R.C.C.</span></div>
+                <nav class="a11y-tools">
+                    <button id="fontUp" title="文字拡大">A+</button>
+                    <button id="fontDown" title="文字縮小">A-</button>
+                </nav>
             </div>
-            <div id="searchStatus" class="status-text"></div>
-        </section>
+        </header>
 
-        <section class="library-section">
-            <h2 class="section-title">GREETING / LIBRARY</h2>
-            <div id="shelf" class="data-grid">
-                <div class="loading">CONNECTING TO DATABASE...</div>
+        <main>
+            <section class="hero">
+                <h1 class="glitch">RAILWAY × TECHNOLOGY</h1>
+                <p class="subtitle">鉄道の情熱を、デジタルの力で形にする。</p>
+            </section>
+
+            <section class="search-unit">
+                <div class="search-bar">
+                    <span class="prefix">ID_ACCESS:</span>
+                    <input type="text" id="idSearchInput" placeholder="SRC-2605A" autocomplete="off">
+                    <button id="searchBtn">EXECUTE</button>
+                </div>
+                <div id="searchStatus" class="status-text"></div>
+            </section>
+
+            <section class="library-container">
+                <h2 class="section-title">LIBRARY ARCHIVE</h2>
+                <div id="shelf" class="grid-layout">
+                    <div class="loading">CONNECTING TO DATABASE...</div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="footer-links">
+                <button id="btnTerms">利用規約</button>
+                <button id="btnPrivacy">プライバシーポリシー</button>
             </div>
-        </section>
-    </main>
+            <p class="copy">© 2026 篠ノ井乗務区 S.R.C.C.</p>
+        </footer>
 
-    <div id="readerOverlay" class="reader-overlay">
-        <div class="reader-bar">
-            <div class="doc-info" id="readerDocTitle">DOCUMENT_VIEWER</div>
-            <div class="reader-actions">
-                <button class="tool-btn" onclick="addStickyNote()">ADD_STICKY（付箋）</button>
-                <button class="close-btn" onclick="closeReader()">CLOSE [X]</button>
+        <div id="reader" class="overlay hidden">
+            <div class="overlay-bar">
+                <span id="docTitle">ACCESSING...</span>
+                <div class="overlay-btns">
+                    <button id="addSticky" class="btn-sm">MEMO+</button>
+                    <button id="closeReader" class="btn-sm close-accent">CLOSE</button>
+                </div>
+            </div>
+            <div id="stickyLayer"></div>
+            <div class="viewer-container">
+                <object id="pdfViewer" data="" type="application/pdf">
+                    <div class="mobile-fallback">
+                        <p>ブラウザの制限により直接表示できません。</p>
+                        <a id="downloadLink" href="" target="_blank" class="btn-primary">ドキュメントを別タブで開く</a>
+                    </div>
+                </object>
             </div>
         </div>
-        <div id="stickyContainer"></div>
-        <div class="reader-content">
-            <iframe id="pdfFrame" src="" frameborder="0"></iframe>
+        
+        <div id="legalOverlay" class="overlay hidden">
+            <div class="overlay-bar">
+                <span id="legalTitle">LEGAL_INFO</span>
+                <button id="closeLegal" class="btn-sm">CLOSE</button>
+            </div>
+            <div class="legal-content" id="legalText">
+                </div>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
