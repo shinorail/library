@@ -4,7 +4,7 @@
     --accent: #00f5d4;
     --text: #c9d1d9;
     --white: #ffffff;
-    --sticky: rgba(255, 243, 128, 0.85);
+    --sticky: rgba(255, 235, 59, 0.9);
     --base-size: 16px;
 }
 
@@ -12,56 +12,52 @@
 
 body {
     margin: 0; background: var(--bg); color: var(--text);
-    font-family: 'Inter', sans-serif; font-size: var(--base-size);
-    height: 100vh; display: flex; flex-direction: column;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    font-size: var(--base-size); line-height: 1.6;
 }
 
 .accent { color: var(--accent); }
 
-/* Header */
-header { border-bottom: 1px solid #30363d; padding: 10px 20px; background: rgba(13, 17, 23, 0.95); z-index: 100; }
+/* Header & Mobile Layout Fix */
+header { border-bottom: 1px solid #30363d; padding: 15px; background: rgba(13, 17, 23, 0.9); }
 .header-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-.a11y-tools button { background: #000; border: 1px solid var(--accent); color: var(--accent); padding: 5px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+.a11y-tools button { background: #000; border: 1px solid var(--accent); color: var(--accent); padding: 5px 10px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-left: 5px; }
 
-/* Hero & Search */
-.hero { text-align: center; padding: 40px 20px; }
-.glitch { font-size: clamp(1.8rem, 7vw, 3.5rem); color: var(--accent); margin: 0; letter-spacing: 2px; }
-.search-unit { max-width: 600px; margin: 0 auto 30px; padding: 0 20px; }
+/* Hero */
+.hero { text-align: center; padding: 30px 20px; }
+.glitch { font-size: clamp(1.5rem, 6vw, 3rem); color: var(--accent); text-shadow: 0 0 15px rgba(0,245,212,0.5); }
+
+/* Search Bar Fix */
+.search-unit { max-width: 500px; margin: 0 auto 30px; padding: 0 15px; }
 .search-bar { display: flex; background: #000; border: 1px solid #30363d; border-radius: 4px; overflow: hidden; }
-.prefix { padding: 12px; font-family: monospace; font-size: 0.7rem; color: var(--accent); border-right: 1px solid #30363d; }
-input { background: none; border: none; color: #fff; padding: 10px; flex-grow: 1; outline: none; width: 100%; }
-#searchBtn { background: var(--accent); border: none; padding: 0 20px; font-weight: bold; color: #000; cursor: pointer; }
+input { background: none; border: none; color: #fff; padding: 12px; flex-grow: 1; font-size: 1rem; outline: none; width: 50%; }
+#searchBtn { background: var(--accent); border: none; padding: 0 15px; font-weight: bold; cursor: pointer; color: #000; }
 
-/* Library Grid - モバイルバグ修正 */
-.library-container { max-width: 1200px; margin: 0 auto; padding: 0 20px 40px; flex-grow: 1; }
-.grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+/* Grid Layout */
+.library-container { max-width: 1200px; margin: 0 auto; padding: 0 15px 50px; }
+.grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
 
-/* Card */
-.card { background: var(--card); border: 1px solid #30363d; padding: 20px; border-radius: 8px; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden; }
-.card:hover { border-color: var(--accent); background: #1c2128; }
-.card h3 { margin: 0 0 8px; font-size: 1.1rem; color: var(--white); }
-.card p { font-size: 0.85rem; color: #8b949e; line-height: 1.5; margin: 0; }
+/* Card Design */
+.card { background: var(--card); border: 1px solid #30363d; padding: 20px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+.card:hover { border-color: var(--accent); box-shadow: 0 0 15px rgba(0,245,212,0.2); }
+.card h3 { margin: 0 0 10px; color: var(--white); font-size: 1.1rem; }
+.card p { font-size: 0.85rem; color: #8b949e; margin: 0; }
 
-/* Overlay - 没入感強化 */
+/* Overlay & Viewer (No download) */
 .overlay { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; }
 .hidden { display: none; }
-.overlay-bar { height: 50px; background: #161b22; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 1px solid var(--accent); }
-#docTitle { font-size: 0.8rem; font-family: monospace; color: var(--accent); }
-.btn-sm { background: #000; border: 1px solid var(--accent); color: var(--accent); padding: 4px 12px; border-radius: 3px; font-size: 0.7rem; cursor: pointer; margin-left: 5px; }
-.close-btn { background: var(--accent); color: #000; font-weight: bold; }
-
-/* Viewer - Android強制DL阻止設定 */
-.viewer-container { flex-grow: 1; overflow: hidden; background: #000; -webkit-overflow-scrolling: touch; }
+.overlay-bar { height: 55px; background: #161b22; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 2px solid var(--accent); }
+.viewer-container { flex-grow: 1; overflow: hidden; position: relative; }
 iframe { width: 100%; height: 100%; border: none; }
 
-/* Sticky Note - サイバーデザイン */
+/* Sticky Notes (New Design) */
 .sticky-note {
-    position: absolute; width: 160px; min-height: 100px; background: var(--sticky); color: #000;
-    padding: 12px; border-left: 6px solid #ffd700; box-shadow: 10px 10px 20px rgba(0,0,0,0.5);
-    z-index: 2000; font-family: cursive; font-size: 0.9rem; pointer-events: auto;
+    position: absolute; width: 140px; min-height: 100px; background: var(--sticky); color: #000;
+    padding: 10px; box-shadow: 5px 5px 15px rgba(0,0,0,0.3); border-left: 5px solid #fbc02d;
+    cursor: move; z-index: 2000; font-family: 'Comic Sans MS', cursive; font-size: 0.85rem;
 }
 
-/* Footer */
-footer { padding: 30px 20px; text-align: center; border-top: 1px solid #30363d; font-size: 0.75rem; }
+/* Footer & Legal */
+footer { padding: 40px; text-align: center; border-top: 1px solid #30363d; }
 .footer-links button { background: none; border: none; color: #8b949e; cursor: pointer; text-decoration: underline; margin: 0 10px; }
-.legal-content { padding: 30px; max-width: 700px; margin: 0 auto; line-height: 1.8; white-space: pre-wrap; overflow-y: auto; }
+.legal-content { padding: 25px; max-width: 800px; margin: 0 auto; line-height: 1.8; white-space: pre-wrap; overflow-y: auto; }
