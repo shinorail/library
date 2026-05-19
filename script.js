@@ -1,95 +1,128 @@
 const CONFIG = {
-    user: "shinorail",
-    repo: "library",
+    user: "shinorail", // あなたのGitHubユーザー名
+    repo: "library",   // あなたのリポジトリ名
     pdfDir: "contents/pdfs",
     mdDir: "contents/metadata"
 };
 
-// 1. 本棚の展開
-async function init() {
+// 1. 起動時：本棚を自動生成
+async function initLibrary() {
     const shelf = document.getElementById('shelf');
     try {
-        const [pdfRes, mdRes] = await Promise.all([
-            fetch(`https://api.github.com/repos/${CONFIG.user}/${CONFIG.repo}/contents/${CONFIG.pdfDir}`),
-            fetch(`https://api.github.com/repos/${CONFIG.user}/${CONFIG.repo}/contents/${CONFIG.mdDir}`)
-        ]);
+        const response = await fetch(`https://api.github.com/repos/${CONFIG.user}/${CONFIG.repo}/contents/${CONFIG.pdfDir}`);
+        const files = await response.json();
         
-        const pdfs = await pdfRes.json();
+        // メタデータ一覧を取得
+        const mdRes = await fetch(`https://api.github.com/repos/${CONFIG.user}/${CONFIG.repo}/contents/${CONFIG.mdDir}`);
         const mds = await mdRes.json();
+
         shelf.innerHTML = '';
 
-        for (const file of pdfs) {
+        for (const file of files) {
             if (!file.name.endsWith('.pdf')) continue;
-            const base = file.name.replace('.pdf', '');
+            const id = file.name.replace('.pdf', '');
             
-            let meta = { title: base, desc: "S.R.C.C. DATA LOG" };
-            const matchMd = mds.find(m => m.name === `${base}.md`);
-
+            // 対応するMDから情報を取得
+            let title = id, desc = "NO DESCRIPTION AVAILABLE";
+            const matchMd = mds.find(m => m.name === `${id}.md`);
+            
             if (matchMd) {
                 const raw = await (await fetch(matchMd.download_url)).text();
-                meta.title = raw.match(/title:\s*(.*)/)?.[1] || meta.title;
-                meta.desc = raw.match(/description:\s*(.*)/)?.[1] || meta.desc;
+                title = raw.match(/title:\s*(.*)/)?.[1] || title;
+                desc = raw.match(/description:\s*(.*)/)?.[1] || desc;
             }
 
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <div class="meta">ARCHIVE NO. ${Math.random().toString(16).substr(2, 6)}</div>
-                <h3>${meta.title}</h3>
-                <p>${meta.desc}</p>
-                <div style="color:var(--accent); font-size:0.8rem">SYSTEM ACCESS ></div>
-            `;
-            // ダウンロード不可の設定（URLに#toolbar=0を追加して標準メニューを隠す）
-            card.onclick = () => openReader(`${file.download_url}#toolbar=0&navpanes=0&scrollbar=0`);
+            const card = createCard(id, title, desc, file.download_url);
             shelf.appendChild(card);
         }
-    } catch (e) { shelf.innerHTML = "DATABASE CONNECTION ERROR."; }
+    } catch (e) {
+        shelf.innerHTML = '<div class="error">DATABASE_OFFLINE: リポジトリ設定を確認してください。</div>';
+    }
 }
 
-// 2. 没入型リーダー
-function openReader(url) {
-    document.getElementById('pdfViewer').src = url;
-    document.getElementById('reader').style.display = 'block';
+function createCard(id, title, desc, url) {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `
+        <div class="meta">ID: ${id.toUpperCase()}</div>
+        <h3>${title}</h3>
+        <p>${desc}</p>
+        <div style="color:var(--accent-color); font-size:0.8rem; margin-top:20px;">SYSTEM_ACCESS ></div>
+    `;
+    div.onclick = () => openReader(url, title);
+    return div;
+}
+
+// 2. 没入型リーダー（ダウンロードを阻止して表示）
+function openReader(url, title) {
+    const overlay = document.getElementById('readerOverlay');
+    const frame = document.getElementById('pdfFrame');
+    document.getElementById('readerDocTitle').innerText = `VIEWING: ${title}`;
+    
+    // #toolbar=0 を付けてブラウザ標準のダウンロードボタンを隠す（気休めだが効果的）
+    frame.src = `${url}#toolbar=0&navpanes=0&view=FitH`;
+    
+    overlay.style.display = 'block';
     document.body.style.overflow = 'hidden';
 }
 
 function closeReader() {
-    document.getElementById('reader').style.display = 'none';
+    document.getElementById('readerOverlay').style.display = 'none';
+    document.getElementById('pdfFrame').src = '';
     document.body.style.overflow = 'auto';
-    document.getElementById('sticky-container').innerHTML = '';
+    document.getElementById('stickyContainer').innerHTML = ''; // 付箋をリセット
 }
 
-// 3. 付箋機能
-document.getElementById('addSticky').onclick = () => {
+// 3. ID検索機能
+document.getElementById('searchBtn').onclick = async () => {
+    const input = document.getElementById('idSearchInput').value.toLowerCase().trim();
+    const status = document.getElementById('searchStatus');
+    if(!input) return;
+
+    status.innerText = "SEARCHING...";
+    
+    try {
+        const response = await fetch(`https://api.github.com/repos/${CONFIG.user}/${CONFIG.repo}/contents/${CONFIG.pdfDir}`);
+        const files = await response.json();
+        const match = files.find(f => f.name.toLowerCase().includes(input));
+
+        if(match) {
+            status.innerText = "MATCH FOUND.";
+            openReader(match.download_url, input.toUpperCase());
+        } else {
+            status.innerText = "ID NOT FOUND.";
+            status.style.color = "#ff4444";
+        }
+    } catch(e) { status.innerText = "CONNECTION ERROR."; }
+};
+
+// 4. 付箋機能
+function addStickyNote() {
     const note = document.createElement('div');
     note.className = 'sticky-note';
     note.contentEditable = true;
     note.innerText = 'MEMO: ';
     note.style.top = '100px';
-    note.style.left = '100px';
+    note.style.left = '50px';
     
-    // 簡易ドラッグ
+    // ドラッグ可能にする
     let isDragging = false;
     note.onmousedown = () => isDragging = true;
     window.onmousemove = (e) => {
         if (!isDragging) return;
-        note.style.left = e.pageX - 75 + 'px';
-        note.style.top = e.pageY - 20 + 'px';
+        note.style.left = e.pageX - 90 + 'px';
+        note.style.top = e.pageY - 50 + 'px';
     };
     window.onmouseup = () => isDragging = false;
     
-    document.getElementById('sticky-container').appendChild(note);
-};
+    document.getElementById('stickyContainer').appendChild(note);
+}
 
-// 4. アクセシビリティ（文字サイズ）
+// 5. アクセシビリティ（フォントサイズ変更）
 let currentSize = 16;
-document.getElementById('fontSizeUp').onclick = () => {
-    currentSize += 2;
-    document.documentElement.style.setProperty('--font-size', currentSize + 'px');
-};
-document.getElementById('fontSizeDown').onclick = () => {
-    currentSize -= 2;
-    document.documentElement.style.setProperty('--font-size', currentSize + 'px');
-};
+function adjustFontSize(delta) {
+    currentSize += delta;
+    document.documentElement.style.setProperty('--font-base', currentSize + 'px');
+}
 
-init();
+initLibrary();
