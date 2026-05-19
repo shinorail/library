@@ -60,4 +60,4 @@ iframe { width: 100%; height: 100%; border: none; }
 /* Footer & Legal */
 footer { padding: 40px; text-align: center; border-top: 1px solid #30363d; }
 .footer-links button { background: none; border: none; color: #8b949e; cursor: pointer; text-decoration: underline; margin: 0 10px; }
-.legal-content { padding: 25px; max-width: 800px; margin: 0 auto; line-height: 1.8; white-space: pre-wrap; overflow-y: auto; }
+.legal-content { padding: 25px; max-width: 800px; margin: 0 auto; line-height: 1.8; white-space: pre-wrap; overflow-y: auto; }　
