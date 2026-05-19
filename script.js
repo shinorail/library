@@ -1,80 +1,58 @@
-// --- 設定項目 ---
-const CONFIG = {
-    user: "shinorail", // ユーザー名
-    repo: "library",   // リポジトリ名
-    pdfDir: "contents/pdfs",
-    mdDir: "contents/metadata"
-};
-
-// --- 自動実行 ---
+// --- 公開図書館システム ---
 async function initLibrary() {
     const shelf = document.getElementById('shelf');
     if (!shelf) return;
 
-    shelf.innerHTML = '<div class="loading">CONNECTING TO S.R.C.C. DATABASE...</div>';
+    shelf.innerHTML = '<div class="loading">SYSTEM INITIALIZING...</div>';
 
     try {
-        // 1. GitHub APIでPDFフォルダのファイル一覧を取得
-        const pdfApiUrl = `https://api.github.com/repos/${CONFIG.user}/${CONFIG.repo}/contents/${CONFIG.pdfDir}`;
-        const response = await fetch(pdfApiUrl);
-        
-        if (!response.ok) throw new Error("API接続に失敗しました");
-        const files = await response.json();
+        // 1. 管理リスト(list.json)を取得
+        const listRes = await fetch('list.json');
+        if (!listRes.ok) throw new Error("LIST_NOT_FOUND");
+        const archives = await listRes.json();
 
-        shelf.innerHTML = ''; // ローディング消去
+        shelf.innerHTML = ''; // クリア
 
-        // 2. ファイルごとにカードを作成
-        for (const file of files) {
-            if (!file.name.toLowerCase().endsWith('.pdf')) continue;
-
-            const id = file.name.toLowerCase().replace('.pdf', '');
-            
-            // メタデータ(.md)を取得してタイトルなどを反映
-            let title = id.toUpperCase();
-            let desc = "S.R.C.C. ARCHIVE DATA";
-
+        for (const id of archives) {
             try {
-                const mdUrl = `https://raw.githubusercontent.com/${CONFIG.user}/${CONFIG.repo}/main/${CONFIG.mdDir}/${id}.md`;
-                const mdRes = await fetch(mdUrl);
-                if (mdRes.ok) {
-                    const mdText = await mdRes.text();
-                    title = mdText.match(/title:\s*(.*)/)?.[1] || title;
-                    desc = mdText.match(/description:\s*(.*)/)?.[1] || desc;
-                }
+                // 2. メタデータ(.md)を取得
+                const mdRes = await fetch(`contents/metadata/${id}.md`);
+                const mdText = await mdRes.text();
+                
+                // タイトルと説明を抽出
+                const title = mdText.match(/title:\s*(.*)/)?.[1] || id.toUpperCase();
+                const desc = mdText.match(/description:\s*(.*)/)?.[1] || "S.R.C.C. ARCHIVE DATA";
+                const pdfUrl = `contents/pdfs/${id}.pdf`;
+
+                // 3. カードを作成
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="meta">ARCHIVE_ID: ${id.toUpperCase()}</div>
+                    <h3>${title}</h3>
+                    <p>${desc}</p>
+                    <div class="system-access" style="color:#00f5d4; font-weight:bold; margin-top:15px;">SYSTEM_ACCESS ></div>
+                `;
+                card.onclick = () => openReader(pdfUrl, title);
+                shelf.appendChild(card);
             } catch (e) {
-                console.warn(`Metadata not found for: ${id}`);
+                console.warn(`Data missing for ID: ${id}`);
             }
-
-            const card = createCard(id, title, desc, file.download_url);
-            shelf.appendChild(card);
         }
-
     } catch (e) {
-        console.error(e);
-        shelf.innerHTML = `<div class="error">DATABASE_OFFLINE: リポジトリの公開設定を確認してください。</div>`;
+        shelf.innerHTML = `<div class="error" style="color:#ff4444;">DATABASE_CONNECTION_ERROR: list.jsonが見つかりません。</div>`;
     }
 }
 
-// カード生成
-function createCard(id, title, desc, url) {
-    const div = document.createElement('div');
-    div.className = 'card';
-    div.innerHTML = `
-        <div class="meta">ARCHIVE_ID: ${id.toUpperCase()}</div>
-        <h3>${title}</h3>
-        <p>${desc}</p>
-        <div class="system-access" style="color:var(--accent-color); font-weight:bold; margin-top:15px;">SYSTEM_ACCESS ></div>
-    `;
-    div.onclick = () => openReader(url, title);
-    return div;
-}
-
-// リーダー表示
+// 没入型リーダーを表示
 function openReader(url, title) {
     const overlay = document.getElementById('readerOverlay');
     const frame = document.getElementById('pdfFrame');
     document.getElementById('readerDocTitle').innerText = `ACCESSING: ${title}`;
+    
+    // ダウンロードボタン等を隠すパラメータ付きで表示
     frame.src = `${url}#toolbar=0&navpanes=0&view=FitH`;
+    
     overlay.style.display = 'block';
     document.body.style.overflow = 'hidden';
 }
@@ -85,22 +63,21 @@ function closeReader() {
     document.body.style.overflow = 'auto';
 }
 
-// 検索機能
-document.getElementById('searchBtn').onclick = async () => {
+// 検索実行
+document.getElementById('searchBtn').onclick = executeSearch;
+async function executeSearch() {
     const input = document.getElementById('idSearchInput').value.toLowerCase().trim();
     if (!input) return;
     
-    // 現在表示されているカードから探す
-    const cards = document.querySelectorAll('.card');
-    let found = false;
-    cards.forEach(card => {
-        if (card.querySelector('.meta').innerText.includes(input.toUpperCase())) {
-            card.click();
-            found = true;
-        }
-    });
-    if(!found) alert("ID NOT FOUND");
-};
+    const res = await fetch('list.json');
+    const list = await res.json();
+    
+    if (list.includes(input)) {
+        openReader(`contents/pdfs/${input}.pdf`, input.toUpperCase());
+    } else {
+        alert("ACCESS DENIED: INVALID ID");
+    }
+}
 
-// 起動！
+// 起動
 initLibrary();
