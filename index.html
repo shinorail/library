@@ -4,219 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>篠ノ井乗務区 | 電子図書館</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --rail-blue: #003366; /* JR風の深い紺 */
-            --rail-green: #2ecc71; /* 信州の自然をイメージ */
-            --bg-gray: #f8f9fa;
-            --text-dark: #333;
-        }
-
-        body {
-            font-family: 'Noto Sans JP', sans-serif;
-            margin: 0; padding: 0;
-            background-color: var(--bg-gray);
-            color: var(--text-dark);
-        }
-
-        /* ヒーローエリア（コンセプト文） */
-        header {
-            background: linear-gradient(135deg, var(--rail-blue), #0055aa);
-            color: white;
-            padding: 60px 20px;
-            text-align: center;
-        }
-
-        .hero-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            letter-spacing: 2px;
-        }
-
-        header p {
-            line-height: 1.8;
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        /* メインコンテンツ */
-        main {
-            max-width: 1100px;
-            margin: -40px auto 40px;
-            padding: 0 20px;
-        }
-
-        /* 図書館（本棚）グリッド */
-        .library-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease;
-            border-top: 5px solid var(--rail-blue);
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .card h3 {
-            margin-top: 0;
-            color: var(--rail-blue);
-        }
-
-        .card p {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        .btn-view {
-            display: inline-block;
-            background: var(--rail-blue);
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-size: 0.9rem;
-            font-weight: bold;
-        }
-
-        /* フッター・モーダル関連 */
-        footer {
-            text-align: center;
-            padding: 40px;
-            background: #fff;
-            font-size: 0.85rem;
-        }
-
-        .footer-links a {
-            margin: 0 15px;
-            color: var(--rail-blue);
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 1000;
-            align-items: center; justify-content: center;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 30px;
-            width: 90%; max-width: 600px;
-            border-radius: 15px;
-            max-height: 80vh; overflow-y: auto;
-        }
-
-        .modal-close {
-            background: var(--rail-blue);
-            color: white; border: none;
-            padding: 10px 20px; border-radius: 5px;
-            cursor: pointer; margin-top: 20px;
-        }
-
-        /* スマホ対応の調整 */
-        @media (max-width: 600px) {
-            header h1 { font-size: 1.8rem; }
-            .library-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-    <div class="hero-content">
+    <div class="hero">
         <h1>篠ノ井乗務区 電子図書館</h1>
-        <p>「篠ノ井乗務区」へようこそ。 当組織は、信州の鉄路を愛する情熱と、現代のシステム開発・クリエイティブ技術を融合させた架空のユニットです。</p>
+        <p>信州の鉄路を愛する情熱と、現代のシステム技術の融合</p>
     </div>
 </header>
 
 <main>
-    <div class="library-grid" id="shelf">
-        <p style="text-align: center; grid-column: 1/-1;">資料を積み込み中...</p>
+    <div class="shelf-container">
+        <div id="shelf" class="book-grid">
+            <p class="loading">資料を配線中...</p>
+        </div>
     </div>
 </main>
 
 <footer>
     <div class="footer-links">
         <a onclick="openModal('terms')">利用規約</a>
-        <a onclick="openModal('privacy')">プライバシーポリシー</a>
+        <a onclick="openModal('privacy')">ポリシー</a>
     </div>
-    <p>&copy; 2026 篠ノ井乗務区 Project - Shinorail Lab.</p>
+    <p>&copy; 2026 篠ノ井乗務区</p>
 </footer>
 
 <div id="modal-bg" class="modal" onclick="closeModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
         <div id="modal-body"></div>
-        <button class="modal-close" onclick="closeModal()">閉じる</button>
+        <button onclick="closeModal()">閉じる</button>
     </div>
 </div>
 
-<script>
-    // GitHubのリポジトリ情報（自分のIDに変更してください）
-    const USER = "shinorail";
-    const REPO = "library"; // リポジトリ名
-    const PDF_PATH = "contents/pdfs";
-
-    async function initLibrary() {
-        try {
-            const response = await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/${PDF_PATH}`);
-            const files = await response.json();
-            const shelf = document.getElementById('shelf');
-            shelf.innerHTML = '';
-
-            if (!Array.isArray(files)) throw new Error("フォルダが見つかりません");
-
-            files.filter(f => f.name.endsWith('.pdf')).forEach(file => {
-                const title = file.name.replace('.pdf', '');
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <h3>${title}</h3>
-                    <p>篠ノ井乗務区 発行資料</p>
-                    <a href="${file.html_url.replace('blob', 'raw')}" class="btn-view" target="_blank">資料を閲覧する</a>
-                `;
-                shelf.appendChild(card);
-            });
-        } catch (e) {
-            document.getElementById('shelf').innerHTML = '<p>資料の読み込みに失敗しました。リポジトリ設定を確認してください。</p>';
-        }
-    }
-
-    const legalText = {
-        terms: `<h2>利用規約</h2><p>本サイトは篠ノ井乗務区の内部資料公開用です。掲載情報の無断転載・商用利用を固く禁じます。本資料の利用によって生じた損害について、当組織は一切の責任を負いません。</p>`,
-        privacy: `<h2>プライバシーポリシー</h2><p>当サイトはGitHub Pagesを利用して公開されています。アクセス情報の取り扱いはGitHubの規約に準じます。当組織が閲覧者の個人情報を直接取得することはありません。</p>`
-    };
-
-    function openModal(type) {
-        document.getElementById('modal-body').innerHTML = legalText[type];
-        document.getElementById('modal-bg').style.display = 'flex';
-    }
-
-    function closeModal() {
-        document.getElementById('modal-bg').style.display = 'none';
-    }
-
-    initLibrary();
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
