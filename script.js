@@ -1,83 +1,125 @@
-// --- 公開図書館システム ---
+const CONFIG = {
+    user: "shinorail",
+    repo: "library",
+    pdfDir: "contents/pdfs",
+    mdDir: "contents/metadata"
+};
+
+let baseFontSize = 16;
+
+// 1. 本棚の自動生成
 async function initLibrary() {
     const shelf = document.getElementById('shelf');
-    if (!shelf) return;
-
-    shelf.innerHTML = '<div class="loading">SYSTEM INITIALIZING...</div>';
-
     try {
-        // 1. 管理リスト(list.json)を取得
-        const listRes = await fetch('list.json');
-        if (!listRes.ok) throw new Error("LIST_NOT_FOUND");
-        const archives = await listRes.json();
+        const res = await fetch(`https://api.github.com/repos/${CONFIG.user}/${CONFIG.repo}/contents/${CONFIG.pdfDir}`);
+        const files = await res.json();
+        shelf.innerHTML = '';
 
-        shelf.innerHTML = ''; // クリア
-
-        for (const id of archives) {
+        for (const file of files) {
+            if (!file.name.endsWith('.pdf')) continue;
+            const id = file.name.replace('.pdf', '');
+            
+            // メタデータ取得
+            let title = id.toUpperCase(), desc = "S.R.C.C. ARCHIVE";
             try {
-                // 2. メタデータ(.md)を取得
                 const mdRes = await fetch(`contents/metadata/${id}.md`);
-                const mdText = await mdRes.text();
-                
-                // タイトルと説明を抽出
-                const title = mdText.match(/title:\s*(.*)/)?.[1] || id.toUpperCase();
-                const desc = mdText.match(/description:\s*(.*)/)?.[1] || "S.R.C.C. ARCHIVE DATA";
-                const pdfUrl = `contents/pdfs/${id}.pdf`;
+                if (mdRes.ok) {
+                    const text = await mdRes.text();
+                    title = text.match(/title:\s*(.*)/)?.[1] || title;
+                    desc = text.match(/description:\s*(.*)/)?.[1] || desc;
+                }
+            } catch(e){}
 
-                // 3. カードを作成
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <div class="meta">ARCHIVE_ID: ${id.toUpperCase()}</div>
-                    <h3>${title}</h3>
-                    <p>${desc}</p>
-                    <div class="system-access" style="color:#00f5d4; font-weight:bold; margin-top:15px;">SYSTEM_ACCESS ></div>
-                `;
-                card.onclick = () => openReader(pdfUrl, title);
-                shelf.appendChild(card);
-            } catch (e) {
-                console.warn(`Data missing for ID: ${id}`);
-            }
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `<div class="id" style="font-family:monospace; font-size:0.7rem; color:gray">ID: ${id}</div><h3>${title}</h3><p>${desc}</p>`;
+            card.onclick = () => openReader(file.download_url, title);
+            shelf.appendChild(card);
         }
     } catch (e) {
-        shelf.innerHTML = `<div class="error" style="color:#ff4444;">DATABASE_CONNECTION_ERROR: list.jsonが見つかりません。</div>`;
+        shelf.innerHTML = '<p>DATABASE CONNECTION ERROR.</p>';
     }
 }
 
-// 没入型リーダーを表示
+// 2. リーダー制御（Android対応）
 function openReader(url, title) {
-    const overlay = document.getElementById('readerOverlay');
-    const frame = document.getElementById('pdfFrame');
-    document.getElementById('readerDocTitle').innerText = `ACCESSING: ${title}`;
+    const reader = document.getElementById('reader');
+    const viewer = document.getElementById('pdfViewer');
+    const dlLink = document.getElementById('downloadLink');
     
-    // ダウンロードボタン等を隠すパラメータ付きで表示
-    frame.src = `${url}#toolbar=0&navpanes=0&view=FitH`;
-    
-    overlay.style.display = 'block';
+    document.getElementById('docTitle').innerText = title;
+    viewer.data = url;
+    dlLink.href = url; // 表示できない場合用
+
+    reader.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
 }
 
 function closeReader() {
-    document.getElementById('readerOverlay').style.display = 'none';
-    document.getElementById('pdfFrame').src = '';
+    document.getElementById('reader').classList.add('hidden');
+    document.getElementById('pdfViewer').data = '';
     document.body.style.overflow = 'auto';
+    document.getElementById('stickyLayer').innerHTML = '';
 }
 
-// 検索実行
-document.getElementById('searchBtn').onclick = executeSearch;
-async function executeSearch() {
-    const input = document.getElementById('idSearchInput').value.toLowerCase().trim();
-    if (!input) return;
+// 3. 付箋機能（ドラッグ＆ドロップ修正）
+function addSticky() {
+    const note = document.createElement('div');
+    note.className = 'sticky-note';
+    note.contentEditable = true;
+    note.innerText = 'MEMO: ';
+    note.style.top = '100px';
+    note.style.left = '50px';
+
+    let isDragging = false;
+    note.onmousedown = (e) => { isDragging = true; };
+    document.onmousemove = (e) => {
+        if (!isDragging) return;
+        note.style.left = e.clientX - 75 + 'px';
+        note.style.top = e.clientY - 50 + 'px';
+    };
+    document.onmouseup = () => { isDragging = false; };
     
-    const res = await fetch('list.json');
-    const list = await res.json();
-    
-    if (list.includes(input)) {
-        openReader(`contents/pdfs/${input}.pdf`, input.toUpperCase());
-    } else {
-        alert("ACCESS DENIED: INVALID ID");
-    }
+    // スマホ用タッチ対応
+    note.ontouchmove = (e) => {
+        const touch = e.touches[0];
+        note.style.left = touch.clientX - 75 + 'px';
+        note.style.top = touch.clientY - 50 + 'px';
+    };
+
+    document.getElementById('stickyLayer').appendChild(note);
 }
 
-// 起動
+// 4. アクセシビリティ & 法的ページ
+function setA11y() {
+    document.getElementById('fontUp').onclick = () => { baseFontSize += 2; updateFont(); };
+    document.getElementById('fontDown').onclick = () => { baseFontSize -= 2; updateFont(); };
+}
+function updateFont() { document.documentElement.style.setProperty('--base-size', baseFontSize + 'px'); }
+
+const LEGAL = {
+    terms: "【利用規約】\\n1. 著作権は篠ノ井乗務区に帰属します。\\n2. 無断転載を禁じます。\\n3. システムの改変・悪用を禁止します。",
+    privacy: "【プライバシーポリシー】\\n1. 本サイトは利用者の個人情報を収集しません。\\n2. キャッシュ機能(PWA)のためブラウザストレージを使用します。"
+};
+
+function showLegal(type) {
+    const overlay = document.getElementById('legalOverlay');
+    document.getElementById('legalTitle').innerText = type === 'terms' ? '利用規約' : 'プライバシーポリシー';
+    document.getElementById('legalText').innerText = LEGAL[type];
+    overlay.classList.remove('hidden');
+}
+
+// 5. 初期化
+document.getElementById('closeReader').onclick = closeReader;
+document.getElementById('addSticky').onclick = addSticky;
+document.getElementById('btnTerms').onclick = () => showLegal('terms');
+document.getElementById('btnPrivacy').onclick = () => showLegal('privacy');
+document.getElementById('closeLegal').onclick = () => document.getElementById('legalOverlay').classList.add('hidden');
+
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+}
+
 initLibrary();
+setA11y();
