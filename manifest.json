@@ -1,0 +1,15 @@
+{
+  "name": "S.R.C.C. LIBRARY ARCHIVE",
+  "short_name": "SRCC Library",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#00f5d4",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
