@@ -4,63 +4,64 @@
     --accent: #00f5d4;
     --text: #c9d1d9;
     --white: #ffffff;
-    --sticky: rgba(255, 243, 128, 0.9);
+    --sticky: rgba(255, 243, 128, 0.85);
     --base-size: 16px;
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }　
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body {
     margin: 0; background: var(--bg); color: var(--text);
-    font-family: 'Inter', 'Noto Sans JP', sans-serif;
-    font-size: var(--base-size); overflow-x: hidden;
+    font-family: 'Inter', sans-serif; font-size: var(--base-size);
+    height: 100vh; display: flex; flex-direction: column;
 }
 
 .accent { color: var(--accent); }
 
-/* Header & Accessibility */
-header { border-bottom: 1px solid #30363d; padding: 15px 20px; background: rgba(13, 17, 23, 0.9); position: sticky; top: 0; z-index: 100; }
+/* Header */
+header { border-bottom: 1px solid #30363d; padding: 10px 20px; background: rgba(13, 17, 23, 0.95); z-index: 100; }
 .header-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-.a11y-tools button { background: none; border: 1px solid #30363d; color: var(--accent); padding: 5px 12px; cursor: pointer; border-radius: 4px; margin-left: 5px; }
+.a11y-tools button { background: #000; border: 1px solid var(--accent); color: var(--accent); padding: 5px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; }
 
 /* Hero & Search */
 .hero { text-align: center; padding: 40px 20px; }
-.glitch { font-size: clamp(1.8rem, 8vw, 3.5rem); color: var(--accent); margin: 0; }
-.search-unit { max-width: 600px; margin: 0 auto 40px; padding: 0 20px; }
-.search-bar { display: flex; background: #000; border: 1px solid #30363d; border-radius: 8px; overflow: hidden; }
+.glitch { font-size: clamp(1.8rem, 7vw, 3.5rem); color: var(--accent); margin: 0; letter-spacing: 2px; }
+.search-unit { max-width: 600px; margin: 0 auto 30px; padding: 0 20px; }
+.search-bar { display: flex; background: #000; border: 1px solid #30363d; border-radius: 4px; overflow: hidden; }
 .prefix { padding: 12px; font-family: monospace; font-size: 0.7rem; color: var(--accent); border-right: 1px solid #30363d; }
-input { background: none; border: none; color: #fff; padding: 10px; flex-grow: 1; outline: none; }
-#searchBtn { background: var(--accent); border: none; padding: 0 20px; font-weight: bold; cursor: pointer; }
+input { background: none; border: none; color: #fff; padding: 10px; flex-grow: 1; outline: none; width: 100%; }
+#searchBtn { background: var(--accent); border: none; padding: 0 20px; font-weight: bold; color: #000; cursor: pointer; }
 
-/* Library Grid - モバイル対応修正 */
-.library-container { max-width: 1200px; margin: 0 auto; padding: 0 20px 60px; }
+/* Library Grid - モバイルバグ修正 */
+.library-container { max-width: 1200px; margin: 0 auto; padding: 0 20px 40px; flex-grow: 1; }
 .grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
 
 /* Card */
-.card { background: var(--card); border: 1px solid #30363d; padding: 25px; border-radius: 12px; cursor: pointer; transition: 0.3s; }
-.card:hover { border-color: var(--accent); transform: translateY(-5px); }
-.card h3 { margin: 0 0 10px; color: var(--white); font-size: 1.1rem; }
-.card p { font-size: 0.85rem; color: #8b949e; margin: 0; }
+.card { background: var(--card); border: 1px solid #30363d; padding: 20px; border-radius: 8px; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden; }
+.card:hover { border-color: var(--accent); background: #1c2128; }
+.card h3 { margin: 0 0 8px; font-size: 1.1rem; color: var(--white); }
+.card p { font-size: 0.85rem; color: #8b949e; line-height: 1.5; margin: 0; }
 
-/* Overlay & Viewer - Android対応修正 */
+/* Overlay - 没入感強化 */
 .overlay { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; }
 .hidden { display: none; }
-.overlay-bar { height: 60px; background: #161b22; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--accent); }
-.viewer-container { flex-grow: 1; position: relative; background: #262626; }
-#pdfViewer { width: 100%; height: 100%; }
+.overlay-bar { height: 50px; background: #161b22; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 1px solid var(--accent); }
+#docTitle { font-size: 0.8rem; font-family: monospace; color: var(--accent); }
+.btn-sm { background: #000; border: 1px solid var(--accent); color: var(--accent); padding: 4px 12px; border-radius: 3px; font-size: 0.7rem; cursor: pointer; margin-left: 5px; }
+.close-btn { background: var(--accent); color: #000; font-weight: bold; }
 
-/* Mobile Fallback */
-.mobile-fallback { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #fff; text-align: center; padding: 20px; }
-.btn-primary { background: var(--accent); color: #000; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 15px; }
+/* Viewer - Android強制DL阻止設定 */
+.viewer-container { flex-grow: 1; overflow: hidden; background: #000; -webkit-overflow-scrolling: touch; }
+iframe { width: 100%; height: 100%; border: none; }
 
-/* Sticky Note - デザイン修正 */
+/* Sticky Note - サイバーデザイン */
 .sticky-note {
-    position: absolute; width: 150px; min-height: 100px; background: var(--sticky); color: #000;
-    padding: 12px; box-shadow: 5px 5px 15px rgba(0,0,0,0.4); cursor: move; z-index: 2000;
-    font-size: 0.9rem; border-left: 5px solid #ffd700; font-family: cursive;
+    position: absolute; width: 160px; min-height: 100px; background: var(--sticky); color: #000;
+    padding: 12px; border-left: 6px solid #ffd700; box-shadow: 10px 10px 20px rgba(0,0,0,0.5);
+    z-index: 2000; font-family: cursive; font-size: 0.9rem; pointer-events: auto;
 }
 
-/* Footer & Legal */
-footer { padding: 40px 20px; text-align: center; border-top: 1px solid #30363d; }
+/* Footer */
+footer { padding: 30px 20px; text-align: center; border-top: 1px solid #30363d; font-size: 0.75rem; }
 .footer-links button { background: none; border: none; color: #8b949e; cursor: pointer; text-decoration: underline; margin: 0 10px; }
-.legal-content { padding: 40px 20px; max-width: 800px; margin: 0 auto; line-height: 1.8; color: #d1d1d1; white-space: pre-wrap; }
+.legal-content { padding: 30px; max-width: 700px; margin: 0 auto; line-height: 1.8; white-space: pre-wrap; overflow-y: auto; }
