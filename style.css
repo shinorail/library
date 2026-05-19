@@ -1,100 +1,94 @@
 :root {
-    --bg-dark: #0a0a0a;
-    --card-bg: #161b22;
-    --accent: #00f5d4; /* メインカラーのシアン */
-    --text-main: #ffffff;
-    --text-dim: #8b949e;
+    --bg: #050505;
+    --card: #0f0f0f;
+    --accent: #00f5d4;
+    --text: #e0e0e0;
+    --font-size: 16px;
 }
 
 body {
-    background-color: var(--bg-dark);
-    color: var(--text-main);
-    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Consolas', 'Courier New', 'Noto Sans JP', sans-serif;
     margin: 0;
+    font-size: var(--font-size);
+    overflow-x: hidden;
 }
 
-/* 図書館セクションのタイトル */
-.library-header {
-    padding: 100px 20px 40px;
-    text-align: center;
-    border-bottom: 1px solid #30363d;
+header {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 40px;
+    border-bottom: 1px solid #222;
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(5,5,5,0.8);
+    backdrop-filter: blur(10px);
 }
 
-.library-header h2 {
-    font-size: 2.5rem;
-    letter-spacing: 0.2em;
-    color: var(--accent);
-    text-shadow: 0 0 20px rgba(0, 245, 212, 0.4);
-}
+.logo { font-weight: bold; letter-spacing: 3px; }
+.logo span { color: var(--accent); }
 
-/* グリッドレイアウト */
-.book-grid {
+.hero-section { text-align: center; padding: 100px 20px; }
+.glitch { font-size: 4rem; color: var(--accent); letter-spacing: 10px; }
+
+.data-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 30px;
-    max-width: 1200px;
-    margin: 60px auto;
-    padding: 0 20px;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 40px;
+    max-width: 1400px;
+    margin: 0 auto 100px;
+    padding: 0 40px;
 }
 
-/* テック感のあるカードデザイン */
+/* カードデザイン（写真/テック融合） */
 .card {
-    background: var(--card-bg);
-    border: 1px solid #30363d;
-    border-radius: 4px; /* あえて丸めすぎない */
-    padding: 30px;
+    background: var(--card);
+    border: 1px solid #333;
+    padding: 40px;
     position: relative;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     cursor: pointer;
-    overflow: hidden;
-}
-
-.card::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; width: 2px; height: 0;
-    background: var(--accent);
-    transition: height 0.4s;
+    transition: 0.4s;
 }
 
 .card:hover {
-    background: #1c2128;
     border-color: var(--accent);
-    transform: translateY(-5px);
-    box-shadow: 0 0 30px rgba(0, 245, 212, 0.1);
+    box-shadow: 0 0 40px rgba(0, 245, 212, 0.15);
+    transform: translateY(-10px);
 }
 
-.card:hover::before {
-    height: 100%;
+.card h3 { color: var(--accent); margin: 0 0 15px; }
+.card .meta { font-size: 0.8rem; color: #666; margin-bottom: 20px; }
+
+/* 没入型リーダー */
+.reader-overlay {
+    display: none;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #000; z-index: 1000;
 }
 
-.card h3 {
-    font-size: 1.2rem;
-    margin: 0 0 15px 0;
-    letter-spacing: 0.05em;
+.reader-controls {
+    position: absolute; top: 20px; right: 40px; z-index: 1010;
 }
 
-.card p {
-    color: var(--text-dim);
-    font-size: 0.9rem;
-    line-height: 1.6;
-    margin-bottom: 25px;
+.reader-controls button {
+    background: none; border: 1px solid var(--accent); color: var(--accent);
+    padding: 10px 20px; cursor: pointer; margin-left: 10px;
 }
 
-.tag {
-    display: inline-block;
-    font-size: 0.7rem;
-    padding: 2px 8px;
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    margin-right: 5px;
-    text-transform: uppercase;
+/* 付箋 */
+.sticky-note {
+    position: absolute; padding: 15px; background: #ffff00; color: #000;
+    width: 150px; z-index: 1005; cursor: move; border-radius: 2px;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
 }
 
-.read-more {
-    font-size: 0.8rem;
-    color: var(--accent);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: bold;
+/* PDFビューアのマスク（ダウンロード禁止の錯覚） */
+.reader-canvas {
+    width: 100%; height: 100%;
+    pointer-events: auto;
+}
+
+embed {
+    /* ブラウザ標準のUIを隠すためのハック（完全ではないがダウンロードボタンは見えにくくなる） */
+    overflow: hidden;
 }
