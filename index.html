@@ -1,1 +1,59 @@
 
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.R.C.C. LIBRARY ARCHIVE</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+    <header>
+        <div class="logo">篠ノ井乗務区 <span class="accent">S.R.C.C.</span></div>
+        <nav class="accessibility-controls">
+            <button onclick="adjustFontSize(2)" title="文字を大きく">A+</button>
+            <button onclick="adjustFontSize(-2)" title="文字を小さく">A-</button>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1 class="glitch" data-text="RAILWAY × TECHNOLOGY">RAILWAY × TECHNOLOGY</h1>
+            <p class="subtitle">鉄道の情熱を、デジタルの力で形にする。</p>
+        </section>
+
+        <section class="search-section">
+            <div class="search-container">
+                <span class="label">ARCHIVE_ACCESS:</span>
+                <input type="text" id="idSearchInput" placeholder="ENTER ID (e.g. SRC-2605A)">
+                <button id="searchBtn">EXECUTE</button>
+            </div>
+            <div id="searchStatus" class="status-text"></div>
+        </section>
+
+        <section class="library-section">
+            <h2 class="section-title">GREETING / LIBRARY</h2>
+            <div id="shelf" class="data-grid">
+                <div class="loading">CONNECTING TO DATABASE...</div>
+            </div>
+        </section>
+    </main>
+
+    <div id="readerOverlay" class="reader-overlay">
+        <div class="reader-bar">
+            <div class="doc-info" id="readerDocTitle">DOCUMENT_VIEWER</div>
+            <div class="reader-actions">
+                <button class="tool-btn" onclick="addStickyNote()">ADD_STICKY（付箋）</button>
+                <button class="close-btn" onclick="closeReader()">CLOSE [X]</button>
+            </div>
+        </div>
+        <div id="stickyContainer"></div>
+        <div class="reader-content">
+            <iframe id="pdfFrame" src="" frameborder="0"></iframe>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
