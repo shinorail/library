@@ -130,3 +130,4 @@ function registerSW() {
 }
 
 init();
+　
